@@ -1,0 +1,18 @@
+INSTALLING:
+
+To install just extract the files to ~/.gnome2/gedit/plugins/, make sure its 
+not a sub-directory (why oh why does that not work for gedit plugins?!). 
+
+
+DEPENDENCIES:
+
+It requires spidermonkey and simplejson (and probably some other stuff). On 
+ubuntu you can get the packages by:
+
+sudo apt-get install spidermonkey-bin python-simplejson
+
+
+USAGE:
+
+The plugin should then appear in the Gedit plugins list under 
+Edit > Preferences > Plugins. Click Tools > JSLint Check to run it.
