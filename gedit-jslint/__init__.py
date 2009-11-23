@@ -22,7 +22,7 @@ class JSLintWindowHelper:
         self._plugin = plugin
         self.tab = None
         self.pane = None
-        
+
         # Insert menu items
         self._insert_menu()
 
@@ -41,7 +41,7 @@ class JSLintWindowHelper:
         # Create a new action group
         self._action_group = gtk.ActionGroup("JSLintPluginActions")
         self._action_group.add_actions([("JSLint", None, _("JSLint Check"),
-                                         None, _("JSLint Check"),
+                                         "<Ctrl>J", _("JSLint Check"),
                                          self.on_jslint_activate)])
 
         # Insert the action group
@@ -71,7 +71,7 @@ class JSLintWindowHelper:
                 self.errorlines.clear()
                 self._window.get_bottom_panel().remove_item(self.pane)
                 self.pane = None
-            
+
 
     def row_clicked(self, treeview, path, view_column, doc):
         lineno, charno = self.lines[path[0]]
@@ -94,7 +94,7 @@ class JSLintWindowHelper:
 
         tmpfile_path = os.path.join(os.path.split(__file__)[0], "jslint.tmp")
         jslint_path = os.path.join(os.path.split(__file__)[0], "fulljslint.js")
-        
+
         jsondata = simplejson.dumps(doc.get_text(doc.get_iter_at_line(0), doc.get_end_iter()))
 
         tmpfile = open(tmpfile_path,"w")
@@ -114,12 +114,12 @@ class JSLintWindowHelper:
             print(output);
         ''')
         tmpfile.close()
-        
+
         command = 'js -f ' + tmpfile_path
         fin,fout = os.popen4(command)
         result = fout.read()
         jslint_results = simplejson.loads(result)
-        
+
         if not self.pane:
             self.errorlines = gtk.ListStore(int,int,str)
             self.pane = gtk.ScrolledWindow()
@@ -146,13 +146,13 @@ class JSLintWindowHelper:
             bottom.add_item(self.pane, 'JSLint', image)
             treeview.connect("row-activated", self.row_clicked, doc)
             self.pane.show_all()
-        
+
         self.errorlines.clear()
         self.lines = []
         for e in jslint_results['errors']:
             self.errorlines.append([e['line']+1, e['character']+1, e['reason']])
             self.lines.append([int(e['line']), int(e['character'])])
-        
+
         self._window.get_bottom_panel().set_property("visible", True)
 
 
@@ -170,4 +170,4 @@ class JSLintPlugin(gedit.Plugin):
 
     def update_ui(self, window):
         self._instances[window].update_ui()
-    
+

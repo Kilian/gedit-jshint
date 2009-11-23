@@ -1,9 +1,10 @@
 [Gedit Plugin]
 Loader=python
-Module=jslint
+Module=gedit-jslint
 IAge=2
 Name=JSLint
 Description=Plugin for running the JSLint javascript verifier
-Authors=Caolan McMahon
-Copyright=Copyright © 2008 Caolan McMahon
-Website=http://www.caolanmcmahon.com/
+Authors=Caolan McMahon Kilian Valkhof
+Copyright=Copyright © 2008 Caolan McMahon, 2009 Kilian Valkhof
+Website=http://github.com/Kilian/gedit-jslint
+
