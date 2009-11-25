@@ -101,7 +101,7 @@ class JSLintWindowHelper:
         tmpfile.writelines("load('" + jslint_path + "');")
         tmpfile.writelines("var body = " + jsondata + ";")
         tmpfile.write('''
-            var result = JSLINT(body, {browser: true, forin: true});
+            var result = JSLINT(body, {onevar: true, browser: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true});
             var errors = [];
             if(JSLINT.errors){
                 for(var i=0; i<JSLINT.errors.length; i++){
