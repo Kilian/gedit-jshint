@@ -8,7 +8,11 @@ DEPENDENCIES:
 It requires spidermonkey and simplejson (and probably some other stuff). On
 ubuntu you can get the packages by:
 
+Ubuntu 9.10 and before:
 sudo apt-get install spidermonkey-bin python-simplejson
+
+Ubuntu 10.04 and later:
+sudo apt-get install rhino python-simplejson
 
 
 USAGE:
