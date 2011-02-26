@@ -91,6 +91,15 @@ class JSHintWindowHelper:
     # Menu activate handlers
     def on_jshint_activate(self, action):
         doc = self._window.get_active_document()
+        view = self._window.get_active_view()
+        buf = view.get_buffer()
+        language = buf.get_language()
+
+        # Only javascript
+        if language.get_id() != 'js':
+          return
+
+
         self.tab = self._window.get_active_tab()
         if not doc:
             return
