@@ -1,14 +1,12 @@
 from gettext import gettext as _
 
 import gtk
+import gconf
 import gedit
 import os
 import simplejson
 import urllib
 
-
-jshint_settings = "/* curly: true, eqeqeq: true, forin: true, undef: true,*/\n"
-jshint_globals = "/* */\n"
 
 ui_str = """<ui>
   <menubar name="MenuBar">
@@ -102,8 +100,8 @@ class JSHintWindowHelper:
         jsondata = doc.get_text(doc.get_iter_at_line(0), doc.get_end_iter())
 
         tmpfile = open(tmpfile_path,"w")
-        tmpfile.writelines(jshint_settings)
-        tmpfile.writelines(jshint_globals)
+        tmpfile.writelines(self._plugin.configuration + "\n")
+        tmpfile.writelines(self._plugin.globals + "\n")
         tmpfile.writelines(jsondata)
         tmpfile.close()
 
@@ -157,6 +155,21 @@ class JSHintPlugin(gedit.Plugin):
         self._instances = {}
 
     def activate(self, window):
+        self.client = gconf.client_get_default()
+        self.prefs_key = "/apps/gedit-jshint"
+        self.client.add_dir(self.prefs_key, gconf.CLIENT_PRELOAD_NONE)
+        self.globals = self.client.get_string(self.prefs_key + "/globals")
+        self.configuration = self.client.get_string(self.prefs_key + "/configuration")
+
+        if self.globals is None:
+            print "true"
+            self.globals = "/* */"
+            self.client.set_string(self.prefs_key + "/globals", self.globals)
+
+        if self.configuration is None:
+            self.configuration = "/* curly: true, eqeqeq: true, forin: true, undef: true,*/"
+            self.client.set_string(self.prefs_key + "/configuration", self.configuration)
+
         self._instances[window] = JSHintWindowHelper(self, window)
 
     def deactivate(self, window):
@@ -170,7 +183,41 @@ class JSHintPlugin(gedit.Plugin):
         return True
 
     def create_configure_dialog(self):
-        dialog = gtk.Dialog("JSHint configuration")
-        # ...code to add widgets to your dialog and connect signal handlers
-        return dialog
+        self.dialog = gtk.Dialog("JSHint Configuration")
+        self.dialog.set_alternative_button_order([gtk.RESPONSE_ACCEPT, gtk.RESPONSE_CANCEL])
+        self.dialog.set_border_width(10)
+
+        self.dialog.vbox.pack_start(gtk.Label("JSHint Configuration"))
+
+        self.configentry = gtk.Entry()
+        self.configentry.set_text(self.configuration)
+        self.dialog.vbox.pack_start(self.configentry, padding=10)
+
+        self.dialog.vbox.pack_start(gtk.Label("JSHint Globals"))
+        self.globalentry = gtk.Entry()
+        self.globalentry.set_text(self.globals)
+        self.dialog.vbox.pack_start(self.globalentry, padding=10)
+
+        infolabel = gtk.Label("Check out the JSHint documentation at jshint.com for the configuration options and notation.")
+        infolabel.set_line_wrap(True)
+        self.dialog.vbox.pack_start(infolabel, padding=10)
+
+        button = gtk.Button(label="Close", stock=gtk.STOCK_CLOSE)
+        button.connect("clicked", self.set_configuration)
+        self.dialog.action_area.pack_end(button)
+        self.dialog.show_all()
+
+        return self.dialog
+
+    def set_configuration(self, widget):
+
+        if self.configentry.get_text() != self.configuration:
+            self.configuration = self.configentry.get_text()
+            self.client.set_string(self.prefs_key + "/configuration", self.configuration)
+
+        if self.globalentry.get_text() != self.globals:
+            self.globals = self.globalentry.get_text()
+            self.client.set_string(self.prefs_key + "/globals", self.globals)
+
+        self.dialog.destroy()
 
