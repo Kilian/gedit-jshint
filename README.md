@@ -1,6 +1,7 @@
 # JSHint plugin for Gedit
 gedit-jshint is a plugin that allow you to check javascript files with the jshint syntax checker.
-For more infomation on JSHint, visit [jshint.com](http://jshint.com)
+For more infomation on JSHint, visit [jshint.com](http://jshint.com).
+It is based on the [gedit-jslint plugin](https://github.com/Kilian/gedit-jslint]) by Caolan McMahon (2008) and Kilian Valkhof (2009 - 2011)
 
 ## INSTALLING:
 
@@ -20,6 +21,6 @@ The plugin should then appear in the Gedit plugins list under Edit > Preferences
 Click Tools > JSHint Check or press Shift+Ctrl+j to run it.
 
 In the configuration dialog you can edit your globals and your configuration. A default configuration is supplied:
-    "/* curly: true, eqeqeq: true, forin: true, undef: true,*/"
+    /* curly: true, eqeqeq: true, forin: true, undef: true,*/
 By default, no globals are defined.
 
