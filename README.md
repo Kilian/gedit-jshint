@@ -9,10 +9,10 @@ To install extract the files to: /usr/lib/gedit-2/plugins/
 
 ## DEPENDENCIES:
 
-It requires rhino and simplejson. On ubuntu you can get the packages by:
-
-Ubuntu 10.04 and later:
+It requires rhino and simplejson. On Ubuntu 10.04 and later you can get the packages with the following command:
     sudo apt-get install rhino python-simplejson
+
+On earlier versions of Ubuntu, and on certain other Linux systems, you might need "spidermonkey" instead of "rhino".
 
 ## USAGE:
 
