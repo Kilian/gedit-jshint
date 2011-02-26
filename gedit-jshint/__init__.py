@@ -173,7 +173,6 @@ class JSHintPlugin(gedit.Plugin):
         self.configuration = self.client.get_string(self.prefs_key + "/configuration")
 
         if self.globals is None:
-            print "true"
             self.globals = "/* */"
             self.client.set_string(self.prefs_key + "/globals", self.globals)
 
