@@ -1,0 +1,10 @@
+[Gedit Plugin]
+Loader=python
+Module=gedit-jshint
+IAge=2
+Name=JSHint
+Description=Plugin for running the JSHint javascript verifier
+Authors=Caolan McMahon, Kilian Valkhof
+Copyright=Copyright © 2008 Caolan McMahon, 2009 - 2011 Kilian Valkhof
+Website=http://github.com/Kilian/gedit-jshint
+

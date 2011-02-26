@@ -4,19 +4,21 @@ import gtk
 import gedit
 import os
 import simplejson
+import urllib
 
 # Menu item example, insert a new item in the Tools menu
 ui_str = """<ui>
   <menubar name="MenuBar">
     <menu name="ToolsMenu" action="Tools">
       <placeholder name="ToolsOps_2">
-        <menuitem name="JSLint" action="JSLint"/>
+        <menuitem name="JSHint" action="JSHint"/>
       </placeholder>
     </menu>
   </menubar>
 </ui>
 """
-class JSLintWindowHelper:
+
+class JSHintWindowHelper:
     def __init__(self, plugin, window):
         self._window = window
         self._plugin = plugin
@@ -39,10 +41,10 @@ class JSLintWindowHelper:
         manager = self._window.get_ui_manager()
 
         # Create a new action group
-        self._action_group = gtk.ActionGroup("JSLintPluginActions")
-        self._action_group.add_actions([("JSLint", None, _("JSLint Check"),
-                                         "<Ctrl>J", _("JSLint Check"),
-                                         self.on_jslint_activate)])
+        self._action_group = gtk.ActionGroup("JSHintPluginActions")
+        self._action_group.add_actions([("JSHint", None, _("JSHint Check"),
+                                         "<Shift><Ctrl>J", _("JSHint Check"),
+                                         self.on_jshint_activate)])
 
         # Insert the action group
         manager.insert_action_group(self._action_group, -1)
@@ -78,7 +80,7 @@ class JSLintWindowHelper:
         view = self._window.get_active_view()
         bf = view.get_buffer()
         try:
-            lineiter = bf.get_iter_at_line_offset(lineno, charno)
+            lineiter = bf.get_iter_at_line_offset(lineno-1, 0 + charno)
         except:
             lineiter = view.get_line_at_y(lineno)
         bf.place_cursor(lineiter)
@@ -86,39 +88,24 @@ class JSLintWindowHelper:
         view.grab_focus()
 
     # Menu activate handlers
-    def on_jslint_activate(self, action):
+    def on_jshint_activate(self, action):
         doc = self._window.get_active_document()
         self.tab = self._window.get_active_tab()
         if not doc:
             return
 
-        tmpfile_path = os.path.join(os.path.split(__file__)[0], "jslint.tmp")
-        jslint_path = os.path.join(os.path.split(__file__)[0], "fulljslint.js")
-
-        jsondata = simplejson.dumps(doc.get_text(doc.get_iter_at_line(0), doc.get_end_iter()))
+        rhinojs_path = os.path.join(os.path.split(__file__)[0], "rhino.js")
+        tmpfile_path = os.path.join(os.path.split(__file__)[0], "jshint.tmp")
+        jsondata = doc.get_text(doc.get_iter_at_line(0), doc.get_end_iter())
 
         tmpfile = open(tmpfile_path,"w")
-        tmpfile.writelines("load('" + jslint_path + "');")
-        tmpfile.writelines("var body = " + jsondata + ";")
-        tmpfile.write('''
-            var result = JSLINT(body, {onevar: true, browser: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true});
-            var errors = [];
-            if(JSLINT.errors){
-                for(var i=0; i<JSLINT.errors.length; i++){
-                    if(JSLINT.errors[i]){
-                        errors.push('{"reason":"' + JSLINT.errors[i].reason + '", "line":' + JSLINT.errors[i].line + ', "character":' + JSLINT.errors[i].character + '}');
-                    }
-                }
-            }
-            var output = '{"errors":[' + errors.join(",") + '], "result":"' + result + '"}';
-            print(output);
-        ''')
+        tmpfile.writelines(jsondata)
         tmpfile.close()
 
-        command = 'js -f ' + tmpfile_path
+        command = 'js -f ' + rhinojs_path + ' jshint.js ' + tmpfile_path
         fin,fout = os.popen4(command)
         result = fout.read()
-        jslint_results = simplejson.loads(result)
+        jshint_results = simplejson.loads(result)
 
         if not self.pane:
             self.errorlines = gtk.ListStore(int,int,str)
@@ -143,26 +130,26 @@ class JSLintWindowHelper:
             image = gtk.Image()
             image.set_from_icon_name('stock_mark', gtk.ICON_SIZE_MENU)
             self.pane.add(treeview)
-            bottom.add_item(self.pane, 'JSLint', image)
+            bottom.add_item(self.pane, 'JSHint', image)
             treeview.connect("row-activated", self.row_clicked, doc)
             self.pane.show_all()
 
         self.errorlines.clear()
         self.lines = []
-        for e in jslint_results['errors']:
-            self.errorlines.append([e['line']+1, e['character']+1, e['reason']])
+        for e in jshint_results['errors']:
+            self.errorlines.append([e['line'], e['character'], urllib.unquote(e['reason'])])
             self.lines.append([int(e['line']), int(e['character'])])
 
         self._window.get_bottom_panel().set_property("visible", True)
 
 
-class JSLintPlugin(gedit.Plugin):
+class JSHintPlugin(gedit.Plugin):
     def __init__(self):
         gedit.Plugin.__init__(self)
         self._instances = {}
 
     def activate(self, window):
-        self._instances[window] = JSLintWindowHelper(self, window)
+        self._instances[window] = JSHintWindowHelper(self, window)
 
     def deactivate(self, window):
         self._instances[window].deactivate()

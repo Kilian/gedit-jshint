@@ -19,5 +19,5 @@ USAGE:
 
 The plugin should then appear in the Gedit plugins list under Edit > Preferences > Plugins.
 
-Click Tools > JSLint Check or press <CTRL>+j to run it.
+Click Tools > JSHint Check or press <Shift><CTRL>+j to run it.
 
