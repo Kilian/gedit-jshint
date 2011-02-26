@@ -20,6 +20,6 @@ The plugin should then appear in the Gedit plugins list under Edit > Preferences
 Click Tools > JSHint Check or press <Shift><CTRL>+j to run it.
 
 In the configuration dialog you can edit your globals and your configuration. A default configuration is supplied:
-    "/\* curly: true, eqeqeq: true, forin: true, undef: true,\*/"
+    "/* curly: true, eqeqeq: true, forin: true, undef: true,*/"
 By default, no globals are defined.
 
