@@ -6,7 +6,10 @@ import os
 import simplejson
 import urllib
 
-# Menu item example, insert a new item in the Tools menu
+
+jshint_settings = "/* curly: true, eqeqeq: true, forin: true, undef: true,*/\n"
+jshint_globals = "/* */\n"
+
 ui_str = """<ui>
   <menubar name="MenuBar">
     <menu name="ToolsMenu" action="Tools">
@@ -80,7 +83,7 @@ class JSHintWindowHelper:
         view = self._window.get_active_view()
         bf = view.get_buffer()
         try:
-            lineiter = bf.get_iter_at_line_offset(lineno-1, 0 + charno)
+            lineiter = bf.get_iter_at_line_offset(lineno-3, 0 + charno)
         except:
             lineiter = view.get_line_at_y(lineno)
         bf.place_cursor(lineiter)
@@ -99,13 +102,18 @@ class JSHintWindowHelper:
         jsondata = doc.get_text(doc.get_iter_at_line(0), doc.get_end_iter())
 
         tmpfile = open(tmpfile_path,"w")
+        tmpfile.writelines(jshint_settings)
+        tmpfile.writelines(jshint_globals)
         tmpfile.writelines(jsondata)
         tmpfile.close()
 
         command = 'js -f ' + rhinojs_path + ' jshint.js ' + tmpfile_path
         fin,fout = os.popen4(command)
         result = fout.read()
-        jshint_results = simplejson.loads(result)
+        if result:
+          jshint_results = simplejson.loads(result)
+        else:
+          jshint_results = simplejson.loads('{"errors": [{"reason": "Not a single error, awesome!", "line": 2, "character": 0}]}')
 
         if not self.pane:
             self.errorlines = gtk.ListStore(int,int,str)
@@ -137,7 +145,7 @@ class JSHintWindowHelper:
         self.errorlines.clear()
         self.lines = []
         for e in jshint_results['errors']:
-            self.errorlines.append([e['line'], e['character'], urllib.unquote(e['reason'])])
+            self.errorlines.append([e['line']-2, e['character'], urllib.unquote(e['reason'])])
             self.lines.append([int(e['line']), int(e['character'])])
 
         self._window.get_bottom_panel().set_property("visible", True)
@@ -157,4 +165,12 @@ class JSHintPlugin(gedit.Plugin):
 
     def update_ui(self, window):
         self._instances[window].update_ui()
+    # configuration
+    def is_configurable(self):
+        return True
+
+    def create_configure_dialog(self):
+        dialog = gtk.Dialog("JSHint configuration")
+        # ...code to add widgets to your dialog and connect signal handlers
+        return dialog
 
