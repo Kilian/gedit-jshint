@@ -19,7 +19,9 @@ ui_str = """<ui>
 </ui>
 """
 
+
 class JSHintWindowHelper:
+
     def __init__(self, plugin, window):
         self._window = window
         self._plugin = plugin
@@ -75,7 +77,6 @@ class JSHintWindowHelper:
                 self._window.get_bottom_panel().remove_item(self.pane)
                 self.pane = None
 
-
     def row_clicked(self, treeview, path, view_column, doc):
         lineno, charno = self.lines[path[0]]
         view = self._window.get_active_view()
@@ -97,7 +98,7 @@ class JSHintWindowHelper:
 
         # Only javascript
         if language.get_id() != 'js':
-          return
+            return
 
 
         self.tab = self._window.get_active_tab()
@@ -108,19 +109,19 @@ class JSHintWindowHelper:
         tmpfile_path = os.path.join(os.path.split(__file__)[0], "jshint.tmp")
         jsondata = doc.get_text(doc.get_iter_at_line(0), doc.get_end_iter())
 
-        tmpfile = open(tmpfile_path,"w")
+        tmpfile = open(tmpfile_path, "w")
         tmpfile.writelines(self._plugin.configuration + "\n")
         tmpfile.writelines(self._plugin.globals + "\n")
         tmpfile.writelines(jsondata)
         tmpfile.close()
 
         command = 'js -f ' + rhinojs_path + ' jshint.js ' + tmpfile_path
-        fin,fout = os.popen4(command)
+        fin, fout = os.popen4(command)
         result = fout.read()
         if result:
-          jshint_results = simplejson.loads(result)
+            jshint_results = simplejson.loads(result)
         else:
-          jshint_results = simplejson.loads('{"errors": [{"reason": "Not a single error, awesome!", "line": 2, "character": 0}]}')
+            jshint_results = simplejson.loads('{"errors": [{"reason": "Not a single error, awesome!", "line": 2, "character": 0}]}')
 
         if not self.pane:
             self.errorlines = gtk.ListStore(int,int,str)
@@ -159,6 +160,7 @@ class JSHintWindowHelper:
 
 
 class JSHintPlugin(gedit.Plugin):
+
     def __init__(self):
         gedit.Plugin.__init__(self)
         self._instances = {}
@@ -187,6 +189,7 @@ class JSHintPlugin(gedit.Plugin):
 
     def update_ui(self, window):
         self._instances[window].update_ui()
+
     # configuration
     def is_configurable(self):
         return True
