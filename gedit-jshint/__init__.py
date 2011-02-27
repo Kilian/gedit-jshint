@@ -82,7 +82,7 @@ class JSHintWindowHelper:
         view = self._window.get_active_view()
         bf = view.get_buffer()
         try:
-            lineiter = bf.get_iter_at_line_offset(lineno-3, 0 + charno)
+            lineiter = bf.get_iter_at_line_offset(lineno-3, 0 + charno - 1)
         except:
             lineiter = view.get_line_at_y(lineno)
         bf.place_cursor(lineiter)
