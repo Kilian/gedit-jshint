@@ -5,7 +5,7 @@ It is based on the [gedit-jslint plugin](https://github.com/Kilian/gedit-jslint]
 
 ## INSTALLING:
 
-To install extract the files to: /usr/lib/gedit-2/plugins/
+To install extract the files to: ~/.gnome2/gedit/plugins/
 
 ## DEPENDENCIES:
 
